@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 set -eu -o pipefail
 
+# Run tests that expect only the .env file to be loaded.
+#
+# This tests must pass when running with all the method bellow:
+#
+#   env -i TERM="$TERM" LC_ALL=C dotenv            ./runtests
+#   env -i TERM="$TERM" LC_ALL=C dotenv --         ./runtests
+#   env -i TERM="$TERM" LC_ALL=C dotenv -e .env -- ./runtests
+
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd )
 
 # shellcheck source=test.inc

@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 set -eu -o pipefail
 
+# Run tests that expect .env and .env.prod file to be loaded.
+#
+# Examples on how to run it:
+#
+#   env -i TERM="$TERM" LC_ALL=C dotenv -c prod -- ./runtests.prod
+#
+# and
+#
+#   env -i TERM="$TERM" LC_ALL=C dotenv -e .env.prod -e .env -- ./runtests.prod
+
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd )
 
 # shellcheck source=test.inc
