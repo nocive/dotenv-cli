@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -eu -o pipefail
+
+# Run tests that expect .env and .env.prod file to be loaded.
+#
+# Examples on how to run it:
+#
+#   env -i TERM="$TERM" LC_ALL=C dotenv -c prod -- ./runtests.prod
+#
+# and
+#
+#   env -i TERM="$TERM" LC_ALL=C dotenv -e .env.prod -e .env -- ./runtests.prod
+
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd )
+
+# shellcheck source=test.inc
+source "$SCRIPT_DIR/test.inc"
+
+function assert_equal() {
+	local test_name="$1"
+	local want_val="$2"
+
+	if [ -z ${!test_name+x} ]; then
+		fail_count=$((fail_count+1))
+		red "FAIL $test_name"
+		echo "  Want: '$want_val'"
+		echo "  Have: unset"
+		return
+	fi
+
+	local have_val="${!test_name}"
+
+	if [ "$want_val" != "$have_val" ]; then
+		fail_count=$((fail_count+1))
+		red "FAIL $test_name"
+		echo "  Want: '$want_val'"
+		echo "  Have: '$have_val'"
+	else
+		pass_count=$((pass_count+1))
+		green "PASS $test_name"
+	fi
+
+}
+
+fail_count=0
+pass_count=0
+
+assert_equal "CASE_01" "Aprod Bprod Cprod" # overridden
+assert_equal "CASE_02" " A B C "           # not overridden
+
+echo ""
+echo "Finished"
+echo "Passed: $pass_count"
+
+if [ "$fail_count" -gt "0" ]; then
+	red "Failed: $fail_count"
+	exit 1
+fi
